@@ -1,0 +1,30 @@
+<form>
+
+    <div class="modal-header">
+        <h3 class="modal-title" id="modal-title">
+            Osoba
+        </h3>
+    </div>
+
+    <div class="modal-body" id="modal-body">
+        <label for="imie">Imię</label>
+        <input class="form-control" id="imie" type="text" ng-model="ctrl.opt.data.firstName" autofocus/>
+        <label for="nazwisko">Nazwisko</label>
+        <input class="form-control" id="nazwisko" type="text" ng-model="ctrl.opt.data.lastName"/>
+        <label for="email">E-mail</label>
+        <input class="form-control" id="email" type="text" ng-model="ctrl.opt.data.email"/>
+        <label for="rok">Rok urodzenia</label>
+        <input class="form-control" id="rok" type="number" ng-model="ctrl.opt.data.yearofbirth"/>
+        <label for="grupy">Grupy</label>
+        <select multiple class="form-control" id="grupy" ng-model="ctrl.opt.data.memberOf">
+            <option ng-repeat="group in ctrl.groups" ng-value="group._id">{{group.name}}</option>
+        </select>
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-success fa fa-check" type="submit" ng-click="ctrl.save()" ng-if="!ctrl.opt.noSave"></button>
+        <button class="btn btn-danger fa fa-trash" type="button" ng-click="ctrl.delete()" ng-if="!ctrl.opt.noDelete"></button>
+        <button class="btn btn-warning fa fa-times" type="button" ng-click="ctrl.cancel()" ng-if="!ctrl.opt.noCancel"></button>
+    </div>
+
+</form>

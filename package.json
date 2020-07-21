@@ -1,0 +1,26 @@
+{
+  "name": "its2020d",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/mariusz.jarocki/its2020d.git"
+  },
+  "author": "Mariusz Jarocki",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/mariusz.jarocki/its2020d/issues"
+  },
+  "homepage": "https://gitlab.com/mariusz.jarocki/its2020d#readme",
+  "dependencies": {
+    "cookies": "^0.8.0",
+    "mongodb": "^3.5.5",
+    "node-static": "^0.7.11",
+    "uuid": "^8.0.0"
+  }
+}
