@@ -1,6 +1,9 @@
-var config = require('./config');
-var reset = false;
+// initialize with data if needed
 
+var config = require('./config'); // data to be initialized
+var reset = false; // reset data to initial state
+
+// holds collections references
 var common = module.exports = {
 
     // sessions: key is session id, value is an object

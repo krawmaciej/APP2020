@@ -1,3 +1,5 @@
+// default data and config
+
 var config = module.exports = {
 
     frontendDir: './public',
@@ -114,9 +116,9 @@ var config = module.exports = {
     ],
 
     exampleGroups: [
-        {"name":"Zarząd"},
-        {"name":"Kadry"},
-        {"name":"IT"}
+        {"name":"Zarząd", "members": 0},
+        {"name":"Kadry", "members": 0},
+        {"name":"IT", "members": 0}
     ]
 
 };

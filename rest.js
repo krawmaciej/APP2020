@@ -4,7 +4,7 @@ var restHelper = require('./restHelper');
 
 var rest = module.exports = {
 
-    'login': function(arg) { restHelper.login(arg) },
+    'login': function(arg) { restHelper.login(arg) }, // funkcja po wywolaniu rest[login] ?, wywolije resthelper login
 
     'person': function(arg) {
         if(!restHelper.checkAccess(arg, [ 1 ])) return;

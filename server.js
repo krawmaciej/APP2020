@@ -1,3 +1,5 @@
+// zapisac w zeszycie
+
 // builtin modules
 var http = require('http');
 var url = require('url');
@@ -36,10 +38,10 @@ httpServer.on('request', function (req, rep) {
 
     var endpoint = url.parse(req.url, true).pathname;
     var query = url.parse(req.url, true).query;
-    var payload = lib.getPayload(req, rep, function(rep, payload) {
+    // create object name from endpoint url: /example/data => example.data
+    var objName = endpoint.replace('/', ' ').trim().replace(' ', '.');
 
-        // create object name from endpoint url: /example/data => example.data
-        var objName = endpoint.replace('/', ' ').trim().replace(' ', '.');
+    lib.getPayload(req, rep, function(rep, payload) {
 
         if(rest[objName] && typeof rest[objName] == 'function') {
             try {

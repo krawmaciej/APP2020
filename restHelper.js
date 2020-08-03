@@ -1,6 +1,6 @@
-var mongodb = require('mongodb');
-var lib = require('./lib');
-var common = require('./common');
+var mongodb = require('mongodb'); //db
+var lib = require('./lib'); //HTTPREST
+var common = require('./common'); // initialize db, also session
 
 var restHelper = module.exports = {
 
@@ -39,6 +39,7 @@ var restHelper = module.exports = {
     },
 
     checkAccess: function(arg, roles) {
+        // if session exists? and if it has roles needed
         var result = common.sessions[arg.session] && roles.includes(common.sessions[arg.session].role);
         if(!result) {
             lib.sendError(arg.response, 403, 'Access denied');
