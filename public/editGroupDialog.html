@@ -1,0 +1,24 @@
+<form>
+
+    <div class="modal-header">
+        <h3 class="modal-title" id="modal-title">
+            Osoba
+        </h3>
+    </div>
+
+    <div class="modal-body" id="modal-body">
+        <label for="nazwa">Nazwa</label>
+        <input class="form-control" id="nazwa" type="text" ng-model="ctrl.opt.data.name" autofocus/>
+        <label for="czlonkowie">Członkowie</label>
+        <select multiple class="form-control" id="czlonkowie" ng-model="ctrl.opt.data.members">
+            <option ng-repeat="person in ctrl.persons" ng-value="person._id">{{person.firstName + ' ' + person.lastName}}</option>
+        </select>
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-success fa fa-check" type="submit" ng-click="ctrl.save()" ng-if="!ctrl.opt.noSave"></button>
+        <button class="btn btn-danger fa fa-trash" type="button" ng-click="ctrl.delete()" ng-if="!ctrl.opt.noDelete"></button>
+        <button class="btn btn-warning fa fa-times" type="button" ng-click="ctrl.cancel()" ng-if="!ctrl.opt.noCancel"></button>
+    </div>
+
+</form>

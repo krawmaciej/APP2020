@@ -4,15 +4,17 @@ var app = angular.module('app2020', [ 'ngSanitize', 'ngAnimate', 'ngRoute', 'ui.
 // router menu
 app.constant('routes', [
 	{ route: '/', templateUrl: 'homeView.html', controller: 'HomeCtrl', controllerAs: 'ctrl', menu: '<i class="fa fa-lg fa-home"></i>', roles: [ 0, 1, 2 ] },
-	{ route: '/example', templateUrl: 'exampleView.html', controller: 'ExampleCtrl', controllerAs: 'ctrl', menu: 'Przykład', roles: [ 1, 2 ] },
-	{ route: '/persons', templateUrl: 'personsView.html', controller: 'PersonsCtrl', controllerAs: 'ctrl', menu: 'Osoby', roles: [ 1, 2 ] }
+	{ route: '/example', templateUrl: 'exampleView.html', controller: 'ExampleCtrl', controllerAs: 'ctrl', menu: 'Przykład', roles: [ 0, 1, 2] },
+    { route: '/persons', templateUrl: 'personsView.html', controller: 'PersonsCtrl', controllerAs: 'ctrl', menu: 'Osoby', roles: [ 1, 2 ] },
+    { route: '/groups', templateUrl: 'groupsView.html', controller: 'GroupsCtrl', controllerAs: 'ctrl', menu: 'Grupy', roles: [ 1 ] }
 ]);
 
 // router installation
 app.config(['$routeProvider', '$locationProvider', 'routes', function($routeProvider, $locationProvider, routes) {
     $locationProvider.hashPrefix('');
 	for(var i in routes) {
-		$routeProvider.when(routes[i].route, routes[i]);
+        $routeProvider.when(routes[i].route, routes[i]);
+        //console.log("routes[i].route=" + routes[i].route + " routes[i]=" + routes[i]);
 	}
 	$routeProvider.otherwise({ redirectTo: '/' });
 }]);
@@ -29,7 +31,7 @@ app.service('common', [ '$uibModal', function($uibModal) {
     common.alert = function(type, text) {
         common._alert.type = type;
         common._alert.text = text;
-        console.log(type + ': ' + text);
+        console.log('alert= ' + type + ': ' + text);
     };
 
     // confirmation dialog function
@@ -67,6 +69,12 @@ app.controller('ConfirmDialog', [ '$uibModalInstance', 'confirmOptions', functio
 
 }]);
 
+// Home controller
+app.controller('HomeCtrl', [ function() {
+    var ctrl = this;
+
+}]);
+
 // controller for the container of views, alerts and menu
 app.controller('ContainerCtrl', ['$http', '$scope', '$location', '$uibModal', 'routes', 'common', function($http, $scope, $location, $uibModal, routes, common) {
     var ctrl = this;
@@ -101,6 +109,7 @@ app.controller('ContainerCtrl', ['$http', '$scope', '$location', '$uibModal', 'r
     // controlling collapsed/not collapsed status
     ctrl.isCollapsed = true;
     $scope.$on('$routeChangeSuccess', function () {
+        console.log('colapsed?');
         ctrl.isCollapsed = true;
     });
 
@@ -150,7 +159,7 @@ app.controller('ContainerCtrl', ['$http', '$scope', '$location', '$uibModal', 'r
                         common.alert('alert-danger', 'Logowanie nieudane');
                     }
                 },
-                function() {}
+                function(err) {}
             );
     
         }

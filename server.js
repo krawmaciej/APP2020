@@ -45,7 +45,7 @@ httpServer.on('request', function (req, rep) {
 
         if(rest[objName] && typeof rest[objName] == 'function') {
             try {
-                console.log(session + ' XHR rest.' + objName, req.method, 'query=' + JSON.stringify(query), 'payload=' + JSON.stringify(payload));
+                console.log(session + ' endpoint=' + endpoint + ' XHR rest.' + objName, req.method, 'query=' + JSON.stringify(query), 'payload=' + JSON.stringify(payload));
                 rest[objName]({ response: rep, method: req.method, query: query, payload: payload, session: session });
             } catch(ex) {
                 lib.sendError(rep, 500, 'Server error ');

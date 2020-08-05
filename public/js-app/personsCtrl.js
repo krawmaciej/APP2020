@@ -69,16 +69,16 @@ app.controller('PersonsCtrl', ['$scope', '$http', '$uibModal', 'common', functio
     ctrl.clickPerson = function(id) {
         $http.get("/person?_id=" + id).then(
             function(rep) {
-                var editPersonOptions = { data: rep.data };
-                editPerson(editPersonOptions);
+                //var editPersonOptions = { data: rep.data };
+                editPerson( { data: rep.data } );
             },
             function(err) {}
         );
     };
 
     ctrl.new = function() {
-        var editPersonOptions = { data: {}, noDelete: true };
-        editPerson(editPersonOptions);
+        //var editPersonOptions = { data: {}, noDelete: true };
+        editPerson( { data: {}, noDelete: true } );
     };
 
     ctrl.limitReached = function() {

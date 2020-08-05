@@ -36,13 +36,38 @@ var rest = module.exports = {
 
     'group': function(arg) {
         if(!restHelper.checkAccess(arg, [ 1 ])) return;
-        restHelper.manageSingleObject(common.groups, arg, null, null);
+        var aggregation = { $lookup: { from: 'persons', localField: 'members', foreignField: '_id', as: 'persons' } };
+        var preparation = function(group) {
+            if(group.members && group.members.length > 0) {
+                for(var i in group.members) {
+                    try {
+                        group.members[i] = mongodb.ObjectId(group.members[i]);
+                    } catch(ex) {}
+                }
+            } else group.members = [];
+            delete group.persons;
+        };
+        restHelper.manageSingleObject(common.groups, arg, aggregation, preparation);
     },
 
     'groups': function(arg) {
-        if(!restHelper.checkAccess(arg, [ 1, 2 ])) return;
-        restHelper.getObjects(common.groups, arg, 10, null, {
-            name: new RegExp(arg.query.search, 'i')
+        if(!restHelper.checkAccess(arg, [ 1 ])) return;
+        var aggregation = { $lookup: { from: 'persons', localField: 'members', foreignField: '_id', as: 'persons' } };
+        restHelper.getObjects(common.groups, arg, 10, aggregation, {
+            $or: [ {
+                name: { $regex: new RegExp(arg.query.search, 'i') } }, {
+                persons: { 
+                    $elemMatch: {
+                        $or: [
+                            { firstName: { $regex: new RegExp(arg.query.search, 'i') } },
+                            { lastName: { $regex: new RegExp(arg.query.search, 'i') } },
+                            { email: { $regex: new RegExp(arg.query.search, 'i') } },
+                            { yearofbirth: { $regex: new RegExp(arg.query.search, 'i') } }
+                        ]
+                    }
+                }
+            }
+            ]
         });
     }
 

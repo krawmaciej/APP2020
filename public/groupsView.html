@@ -1,0 +1,41 @@
+<form class="form-inline" style="float: left;">
+    <input id="limit" class="form-control" type="number" ng-model="ctrl.limit" ng-change="ctrl.loadGroups()" style="width: 8em;"/>
+    <label for="limit" class="fa fa-list-ol"></label>
+    <input id="search" class="form-control" type="text" ng-model="ctrl.search" ng-change="ctrl.loadGroups()"/>
+    <label for="search" class="fa fa-search"></label>
+</form>
+
+&nbsp;&nbsp;&nbsp;
+
+<span class label="label label-default">
+    Pasujących
+    <span class="badge" ng-bind="ctrl.groupsFiltered"></span>
+</span>
+<span class label="label label-default">
+    Wszystkich
+    <span class="badge" ng-bind="ctrl.groupsCount"></span>
+</span>
+
+<form class="form-inline" style="float: right;">
+    <button class="btn btn-primary fa fa-plus" ng-click="ctrl.new()"></button>
+</form>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Nazwa</th>
+            <th>Liczba członków</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="group in ctrl.groups" ng-click="ctrl.clickGroup(group._id)">
+            <td ng-bind="group.name"></td>
+            <td ng-bind="group.persons.length"></td>
+            <td ng-bind="group.numberOfMembers"></td>
+        </tr>
+    </tbody>
+</table>
+
+<div>
+    <button class="btn btn-default fa fa-angle-down" ng-click="ctrl.increaseLimit()" ng-disabled="ctrl.limitReached()"></button>
+</div>
