@@ -69,6 +69,9 @@ var restHelper = module.exports = {
                 break;
             case 'PUT':
                 try {
+                    //to delete
+                    console.log('put->arg.payload=' + JSON.stringify(arg.payload));
+
                     var id = mongodb.ObjectId(arg.payload._id);
                     delete arg.payload._id;
                     if(preparation) preparation(arg.payload);
