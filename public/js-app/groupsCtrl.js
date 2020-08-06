@@ -103,37 +103,61 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
     ctrl.loadGroups();
 
     // db relation helpers
-    var getPersonMemberOf = function (personID) {
+    var getPersonMemberOf = function (personID, callback) {
         $http.get("/person?_id=" + personID).then(
             function(rep) {
-                return rep.data.memberOf ? rep.data.memberOf : [];
+                var personMemberOf = rep.data.memberOf ? rep.data.memberOf : [ ];
+                callback(personID, personMemberOf);
+            },
+            function(err) {}
+        );
+    }
+
+    var getGroupMembers = function (groupID, callback) {
+        $http.get("/group?_id=" + groupID).then(
+            function(rep) {
+                var groupMembers = rep.data.members ? rep.data.members : [ ];
+                callback(groupMembers);
             },
             function(err) {}
         );
     }
 
 
-    var deleteGroupFromPersons = function(data) {
-
+    var deleteGroupFromPersons = function(data, callback = null) {
+        getGroupMembers(data._id, function(groupMembers) {
+            for (var i = 0; i < groupMembers.length; ++i) {
+                getPersonMemberOf(groupMembers[i], 
+                    function(personID, personMemberOf) {
+                        var index = personMemberOf.indexOf(data._id);
+                        if (index > -1) {
+                            personMemberOf.splice(index, 1);
+                            var personToModify = { _id: personID, memberOf: personMemberOf };
+                            $http.put("/person", personToModify);
+                        }
+                    }
+                );
+            }
+        });
+        if (callback) callback();
     }
 
     var addGroupToPersons = function(data) {
         if (!data.members) return;
         for (var i = 0; i < data.members.length; ++i) {
-            $http.get("/person?_id=" + data.members[i]).then(
-                function(rep) {
-                    var personMemberOf = rep.data.memberOf ? rep.data.memberOf : [ ];
-
+            getPersonMemberOf(data.members[i], 
+                function(personID, personMemberOf) {
                     if (!personMemberOf.includes(data._id)) {
-                        var personToModify = { _id: rep.data._id, memberOf: personMemberOf };
-                        personToModify.memberOf.push(data._id);
+                        personMemberOf.push(data._id);
+                        var personToModify = { _id: personID, memberOf: personMemberOf };
                         $http.put("/person", personToModify);
                     }
-                },
-                function(err) {}
+                }
             );
         }
     }
+
+    // deletion before addition
 
     var changeGroup = function(data) {
         // maybe needs to be replaced by rest calls to servers
@@ -141,15 +165,18 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
         // not be included in data.persons
         // in that case list of members should be saved before modyfication
         // data contains id of a group, however data of members is already modyfied
-        console.log('data.members=' + JSON.stringify(data.members));
+        //console.log('data.members=' + JSON.stringify(data.members));
         // but if you get group from mongo by it's id, member list should be different
+        /*
         $http.get("/group?_id=" + data._id).then(
             function(rep) {
                 console.log('rep.members=' + JSON.stringify(rep.data.members));
             },
             function(err) {}
         );
-         
+        */
+
+        
 
         /*
         if (!data.persons) return;
@@ -170,8 +197,8 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
             );
         }
         */
-
-        addGroupToPersons(data);
+        
+        deleteGroupFromPersons(data, addGroupToPersons(data));
         
         // need to get memberof table for each new person
         // use id from members to append memberof tables with group id
