@@ -92,6 +92,11 @@ var restHelper = module.exports = {
                 if(preparation) preparation(arg.payload);
                 collection.insertOne(arg.payload, function(err, inserted) {
                     if(!err) {
+                        //console.log('pload=' + JSON.stringify(arg.payload));
+                        //console.log('arg.resp=' + JSON.stringify(arg.response));
+                        //console.log('inserted.ops[0]=' + JSON.stringify(inserted.ops[0]));
+                        //console.log('inserted.ops=' + JSON.stringify(inserted.ops));
+                        //console.log('inserted=' + JSON.stringify(inserted));
                         lib.sendJson(arg.response, inserted.ops[0]);
                     } else {
                         lib.sendError(arg.response, 400, 'Insert failed');

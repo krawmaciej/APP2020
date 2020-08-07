@@ -14,17 +14,6 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
             function(rep) {
                 ctrl.groups = rep.data.data;
 
-                console.log('ctrl.groups=' + ctrl.groups);
-                //stupido to change
-                /*
-                for(var group in ctrl.groups) {
-                    group.numberOfMembers = group.persons.length;
-                    console.log('group=' + group);
-                    console.log('group.persons=' + group.persons);
-                    console.log('group.persons.length=' + group.persons.length);
-                }
-                */
-
                 ctrl.groupsCount = rep.data.count;
                 ctrl.groupsFiltered = rep.data.filtered;
                 if(callback) callback();
@@ -123,32 +112,13 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
         );
     }
 
-
-    var deleteGroupFromPersons = function(data, callback = null) {
-        getGroupMembers(data._id, function(groupMembers) {
-            for (var i = 0; i < groupMembers.length; ++i) {
-                getPersonMemberOf(groupMembers[i], 
-                    function(personID, personMemberOf) {
-                        var index = personMemberOf.indexOf(data._id);
-                        if (index > -1) {
-                            personMemberOf.splice(index, 1);
-                            var personToModify = { _id: personID, memberOf: personMemberOf };
-                            $http.put("/person", personToModify);
-                        }
-                    }
-                );
-            }
-        });
-        if (callback) callback();
-    }
-
-    var addGroupToPersons = function(data) {
-        if (!data.members) return;
-        for (var i = 0; i < data.members.length; ++i) {
-            getPersonMemberOf(data.members[i], 
+    var deleteGroupFromPersons = function(groupID, notMembers) {
+        for (var i = 0; i < notMembers.length; ++i) {
+            getPersonMemberOf(notMembers[i], 
                 function(personID, personMemberOf) {
-                    if (!personMemberOf.includes(data._id)) {
-                        personMemberOf.push(data._id);
+                    var index = personMemberOf.indexOf(groupID);
+                    if (index > -1) {
+                        personMemberOf.splice(index, 1);
                         var personToModify = { _id: personID, memberOf: personMemberOf };
                         $http.put("/person", personToModify);
                     }
@@ -157,70 +127,41 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
         }
     }
 
-    // deletion before addition
-
-    var changeGroup = function(data) {
-        // maybe needs to be replaced by rest calls to servers
-        // because of pagination, might persons from other pages
-        // not be included in data.persons
-        // in that case list of members should be saved before modyfication
-        // data contains id of a group, however data of members is already modyfied
-        //console.log('data.members=' + JSON.stringify(data.members));
-        // but if you get group from mongo by it's id, member list should be different
-        /*
-        $http.get("/group?_id=" + data._id).then(
-            function(rep) {
-                console.log('rep.members=' + JSON.stringify(rep.data.members));
-            },
-            function(err) {}
-        );
-        */
-
-        
-
-        /*
-        if (!data.persons) return;
-        for (var i = 0; i < data.persons.length; ++i) {
-            $http.get("/person?_id=" + data.persons[i]._id).then(
-                function(rep) {
-                    var personMemberOf = rep.data.memberOf ? rep.data.memberOf : [ ];
-
-                    // if is a member of group
-                    var index = personMemberOf.indexOf(data._id);
-                    if (index > -1) {
-                        var personToModify = { _id: rep.data._id, memberOf: personMemberOf };
-                        personToModify.memberOf.push(data._id);
+    var addGroupToPersons = function(groupID, members) {
+        for (var i = 0; i < members.length; ++i) {
+            getPersonMemberOf(members[i], 
+                function(personID, personMemberOf) {
+                    if (!personMemberOf.includes(groupID)) {
+                        personMemberOf.push(groupID);
+                        var personToModify = { _id: personID, memberOf: personMemberOf };
                         $http.put("/person", personToModify);
                     }
-                },
-                function(err) {}
+                }
             );
         }
-        */
+    }
+
+    var difference = function(a, b) {
+        return a.filter(function(aElem) {
+            return !b.includes(aElem);
+        });
+    };
+
+    var changeGroup = function(data) {
+        // update persons
+        getGroupMembers(data._id, function(groupMembers) {
+            data.members = data.members ? data.members : [];
+
+            var toDelete = difference(groupMembers, data.members);
+            var toAdd = difference(data.members, groupMembers);
+
+            deleteGroupFromPersons(data._id, toDelete);
+            addGroupToPersons(data._id, toAdd);
+        });
         
-        deleteGroupFromPersons(data, addGroupToPersons(data));
-        
-        // need to get memberof table for each new person
-        // use id from members to append memberof tables with group id
-        // also need to remove id from memberof of deleted persons
-        // ^^^^ get from data.persons[i]._id and remove group id from memberOf
-        /* useful
-                for (var i = 0; i < data.persons.length; ++i) {
-                    data.persons[i].memberOf.push(data._id);
-                    console.log(JSON.stringify(data.persons[i].memberOf));
-                }
-        */
-        
+        // update group
         $http.put("/group", data).then(
             function(rep) {
-                // to delete
-                console.log('whole data=' + JSON.stringify(data));
-                /* useful
-                for (var i = 0; i < data.persons.length; ++i) {
-                    data.persons[i].memberOf.push(data._id);
-                    console.log(JSON.stringify(data.persons[i].memberOf));
-                }
-                */
                 ctrl.loadGroups();
                 common.alert('alert-success', 'Dane zmienione');
             },
@@ -229,6 +170,10 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
     };
 
     var deleteGroup = function(id) {
+        getGroupMembers(id, function(groupMembers) {
+            deleteGroupFromPersons(id, groupMembers);
+        });
+
         $http.delete("/group?_id=" + id).then(
             function(rep) {
                 ctrl.loadGroups();
@@ -241,6 +186,9 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
     var insertGroup = function(data) {
         $http.post("/group", data).then(
             function(rep) {
+                data.members = data.members ? data.members : [];
+                addGroupToPersons(rep.data._id, data.members);
+                
                 ctrl.loadGroups();
                 common.alert('alert-success', 'Dane dodane');
             },
