@@ -13,11 +13,16 @@ app.controller('EditGroupCtrl', ['$http', '$uibModalInstance', 'editGroupOptions
 
     ctrl.save = function() { $uibModalInstance.close('save'); };
     ctrl.delete = function() {
-        common.confirm({ title: 'Uwaga!', body: 'Czy na pewno chcesz skasować ten rekord?', noOk: false, noCancel: false }, function(answer) {
-            if(answer) {
-                $uibModalInstance.close('delete');
-            }
-        });
+        if (ctrl.opt.data.members && ctrl.opt.data.members.length) {
+            common.confirm({ title: 'Uwaga!', body: 'Grupa zawiera członków, czy na pewno chcesz ją skasować?', noOk: false, noCancel: false }, function(answer) {
+                if(answer) {
+                    $uibModalInstance.close('delete');
+                }
+            });
+        } else {
+            $uibModalInstance.close('delete');
+        }
+
     }
     ctrl.cancel = function() { $uibModalInstance.dismiss('cancel'); };
 

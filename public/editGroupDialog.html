@@ -2,7 +2,7 @@
 
     <div class="modal-header">
         <h3 class="modal-title" id="modal-title">
-            Osoba
+            Grupa
         </h3>
     </div>
 
@@ -11,7 +11,9 @@
         <input class="form-control" id="nazwa" type="text" ng-model="ctrl.opt.data.name" autofocus/>
         <label for="czlonkowie">Członkowie</label>
         <select multiple class="form-control" id="czlonkowie" ng-model="ctrl.opt.data.members">
-            <option ng-repeat="person in ctrl.persons" ng-value="person._id">{{person.firstName + ' ' + person.lastName}}</option>
+            <option ng-repeat="person in ctrl.persons" ng-value="person._id">
+                {{person.firstName + ' ' + person.lastName + ' : ' + person.email}}
+            </option>
         </select>
     </div>
 

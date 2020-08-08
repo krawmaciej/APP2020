@@ -13,9 +13,12 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
         $http.get("/groups?limit=" + ctrl.limit + "&search=" + ctrl.search).then(
             function(rep) {
                 ctrl.groups = rep.data.data;
-
                 ctrl.groupsCount = rep.data.count;
                 ctrl.groupsFiltered = rep.data.filtered;
+                
+                if (ctrl.limit > ctrl.groupsFiltered) 
+                    ctrl.limit = ctrl.groupsFiltered;
+
                 if(callback) callback();
             },
             function(err) {
@@ -24,7 +27,7 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
                 ctrl.groupsFiltered = 0;                
             }
         );
-    };
+    }
 
     ctrl.increaseLimit = function() {
         ctrl.limit += 5;
@@ -67,7 +70,7 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
             function (err) {}
         );
 
-    };
+    }
 
     ctrl.clickGroup = function(id) {
         $http.get("/group?_id=" + id).then(
@@ -77,21 +80,27 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
             },
             function(err) {}
         );
-    };
+    }
 
     ctrl.new = function() {
         var editGroupOptions = { data: {}, noDelete: true };
         editGroup(editGroupOptions);
-    };
+    }
 
     ctrl.limitReached = function() {
         return ctrl.groupsFiltered <= ctrl.limit;
-    };
+    }
 
     // the first call
     ctrl.loadGroups();
 
     // db relation helpers
+    var difference = function(a, b) {
+        return a.filter(function(aElem) {
+            return !b.includes(aElem);
+        });
+    }
+
     var getPersonMemberOf = function (personID, callback) {
         $http.get("/person?_id=" + personID).then(
             function(rep) {
@@ -112,9 +121,9 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
         );
     }
 
-    var deleteGroupFromPersons = function(groupID, notMembers) {
-        for (var i = 0; i < notMembers.length; ++i) {
-            getPersonMemberOf(notMembers[i], 
+    var deleteGroupFromPersons = function(groupID, notAMemberOf) {
+        for (var i = 0; i < notAMemberOf.length; ++i) {
+            getPersonMemberOf(notAMemberOf[i], 
                 function(personID, personMemberOf) {
                     var index = personMemberOf.indexOf(groupID);
                     if (index > -1) {
@@ -141,12 +150,6 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
         }
     }
 
-    var difference = function(a, b) {
-        return a.filter(function(aElem) {
-            return !b.includes(aElem);
-        });
-    };
-
     var changeGroup = function(data) {
         // update persons
         getGroupMembers(data._id, function(groupMembers) {
@@ -167,7 +170,7 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
             },
             function(err) {}    
         );
-    };
+    }
 
     var deleteGroup = function(id) {
         getGroupMembers(id, function(groupMembers) {
@@ -181,7 +184,7 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
             },
             function(err) {}
         );
-    };
+    }
 
     var insertGroup = function(data) {
         $http.post("/group", data).then(
@@ -194,6 +197,6 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
             },
             function(err) {}    
         );
-    };
+    }
 
 }]);

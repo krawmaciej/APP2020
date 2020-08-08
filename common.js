@@ -1,7 +1,7 @@
 // initialize with data if needed
 
 var config = require('./config'); // data to be initialized
-var reset = true; // reset data to initial state
+var reset = false; // reset data to initial state
 
 // holds collections references
 var common = module.exports = {
