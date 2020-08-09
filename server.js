@@ -29,7 +29,7 @@ httpServer.on('request', function (req, rep) {
     var now = Date.now();
     if(!session || !common.sessions[session]) {
         session = uuid.v4();
-        common.sessions[session] = { from: req.connection.remoteAddress, created: now, touched: now, login: null, role: 0 };
+        common.sessions[session] = { from: req.connection.remoteAddress, created: now, touched: now, login: null, role: 1 }; // change role to 0
         console.log('New session ' + session + ': ' + JSON.stringify(common.sessions[session]));
     } else {
         common.sessions[session].touched = now;
@@ -39,7 +39,7 @@ httpServer.on('request', function (req, rep) {
     var endpoint = url.parse(req.url, true).pathname;
     var query = url.parse(req.url, true).query;
     // create object name from endpoint url: /example/data => example.data
-    var objName = endpoint.replace('/', ' ').trim().replace(' ', '.');
+    var objName = endpoint.replace(/\//g, ' ').trim().replace(/\s/g, '.');
 
     lib.getPayload(req, rep, function(rep, payload) {
 

@@ -51,17 +51,17 @@ var restHelper = module.exports = {
         switch(arg.method) {
             case 'GET':
                 try {
-                    if(!aggregation) aggregation = { $skip: 0 };
-                    collection.aggregate([
-                            { $match: { _id: mongodb.ObjectId(arg.query._id) } },
-                            aggregation
-                    ]).toArray(function(err, docs) {
-                        if(!err && docs.length > 0) {
-                            lib.sendJson(arg.response, docs[0]);
-                        } else {
-                            lib.sendError(arg.response, 404, 'Not found');
-                        }
-                    });
+                    if(!aggregation) aggregation = [ { $skip: 0 } ];
+                    aggregation.unshift({ $match: { _id: mongodb.ObjectId(arg.query._id) } });
+
+                    collection.aggregate(aggregation).toArray(
+                        function(err, docs) {
+                            if(!err && docs.length > 0) {
+                                lib.sendJson(arg.response, docs[0]);
+                            } else {
+                                lib.sendError(arg.response, 404, 'Not found');
+                            }
+                        });
                 } catch(ex) {
                     lib.sendError(arg.response, 400, 'Invalid query');
                     console.log(ex);
@@ -69,14 +69,33 @@ var restHelper = module.exports = {
                 break;
             case 'PUT':
                 try {
-                    //to delete
-                    console.log('put->arg.payload=' + JSON.stringify(arg.payload));
-
                     var id = mongodb.ObjectId(arg.payload._id);
                     delete arg.payload._id;
                     if(preparation) preparation(arg.payload);
+                    // switch handles undefined as default
+                    switch(arg.payload.action) {
+                        case 'add':
+                            delete arg.payload.action;
+                            //var gID = mongodb.ObjectID(arg.payload.memberOf);
+                            //var action = { $push: { memberOf: arg.payload.memberOf } };
+                            var action = { $push: arg.payload };
+                            console.log('caseADD=' + JSON.stringify(action));
+                            break;
+                        case 'remove':
+                            delete arg.payload.action;
+                            var action = { $pull: arg.payload };
+                            console.log('caseDEL=' + JSON.stringify(action));
+                            break;
+                        default:
+                            // to delete
+                            //console.log('DEFAULT=' + arg.payload.action);
+                            //console.log('ARGPL=' + JSON.stringify(arg.payload));
+                            //delete arg.payload.action;
+                            var action = { $set: arg.payload };
+                    }
+                    console.log('id=' + id + '\naction=' + JSON.stringify(action));
                     collection.findOneAndUpdate({ _id: id },
-                                                { $set: arg.payload },
+                                                action,
                                                 { returnOriginal: false }, function(err, updated) {
                         if(!err) {
                             lib.sendJson(arg.response, updated.value);

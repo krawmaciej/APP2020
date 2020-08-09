@@ -15,9 +15,6 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
                 ctrl.groups = rep.data.data;
                 ctrl.groupsCount = rep.data.count;
                 ctrl.groupsFiltered = rep.data.filtered;
-                
-                if (ctrl.limit > ctrl.groupsFiltered) 
-                    ctrl.limit = ctrl.groupsFiltered;
 
                 if(callback) callback();
             },
@@ -101,18 +98,8 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
         });
     }
 
-    var getPersonMemberOf = function (personID, callback) {
-        $http.get("/person?_id=" + personID).then(
-            function(rep) {
-                var personMemberOf = rep.data.memberOf ? rep.data.memberOf : [ ];
-                callback(personID, personMemberOf);
-            },
-            function(err) {}
-        );
-    }
-
     var getGroupMembers = function (groupID, callback) {
-        $http.get("/group?_id=" + groupID).then(
+        $http.get("/group/members?_id=" + groupID).then(
             function(rep) {
                 var groupMembers = rep.data.members ? rep.data.members : [ ];
                 callback(groupMembers);
@@ -121,45 +108,23 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
         );
     }
 
-    var deleteGroupFromPersons = function(groupID, notAMemberOf) {
-        for (var i = 0; i < notAMemberOf.length; ++i) {
-            getPersonMemberOf(notAMemberOf[i], 
-                function(personID, personMemberOf) {
-                    var index = personMemberOf.indexOf(groupID);
-                    if (index > -1) {
-                        personMemberOf.splice(index, 1);
-                        var personToModify = { _id: personID, memberOf: personMemberOf };
-                        $http.put("/person", personToModify);
-                    }
-                }
-            );
-        }
-    }
-
-    var addGroupToPersons = function(groupID, members) {
-        for (var i = 0; i < members.length; ++i) {
-            getPersonMemberOf(members[i], 
-                function(personID, personMemberOf) {
-                    if (!personMemberOf.includes(groupID)) {
-                        personMemberOf.push(groupID);
-                        var personToModify = { _id: personID, memberOf: personMemberOf };
-                        $http.put("/person", personToModify);
-                    }
-                }
-            );
-        }
-    }
-
     var changeGroup = function(data) {
         // update persons
-        getGroupMembers(data._id, function(groupMembers) {
-            data.members = data.members ? data.members : [];
+        getGroupMembers(data._id, function(groupMembersThen) {
+            var groupMembersNow = data.members ? data.members : [];
 
-            var toDelete = difference(groupMembers, data.members);
-            var toAdd = difference(data.members, groupMembers);
+            var toDeleteFrom = difference(groupMembersThen, groupMembersNow);
+            var toAddTo = difference(groupMembersNow, groupMembersThen);
 
-            deleteGroupFromPersons(data._id, toDelete);
-            addGroupToPersons(data._id, toAdd);
+            for (var i in toDeleteFrom) {
+                var payload = { _id: toDeleteFrom[i], memberOf: data._id, action: 'remove' };
+                $http.put("/person/memberof", payload);
+            }
+            
+            for (var i in toAddTo) {
+                var payload = { _id: toAddTo[i], memberOf: data._id, action: 'add' };
+                $http.put("/person/memberof", payload);
+            }
         });
         
         // update group

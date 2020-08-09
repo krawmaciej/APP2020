@@ -15,9 +15,6 @@ app.controller('PersonsCtrl', ['$scope', '$http', '$uibModal', 'common', functio
                 ctrl.persons = rep.data.data;
                 ctrl.personsCount = rep.data.count;
                 ctrl.personsFiltered = rep.data.filtered;
-                
-                if (ctrl.limit > ctrl.personsFiltered) 
-                    ctrl.limit = ctrl.personsFiltered;
                     
                 if(callback) callback();
             },

@@ -116,9 +116,9 @@ var config = module.exports = {
     ],
 
     exampleGroups: [
-        {"name":"Zarząd"},
-        {"name":"Kadry"},
-        {"name":"IT"}
+        {"name":"Zarząd", "description":"Zarządza firmą"},
+        {"name":"Kadry", "description":"Grupa kadr"},
+        {"name":"IT", "description":"Odpowiedzialna za działanie systemu"}
     ]
 
 };
