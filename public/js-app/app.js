@@ -109,7 +109,6 @@ app.controller('ContainerCtrl', ['$http', '$scope', '$location', '$uibModal', 'r
     // controlling collapsed/not collapsed status
     ctrl.isCollapsed = true;
     $scope.$on('$routeChangeSuccess', function () {
-        console.log('colapsed?');
         ctrl.isCollapsed = true;
     });
 

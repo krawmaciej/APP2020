@@ -108,6 +108,14 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
         );
     }
 
+    var changePersonsMemberOf = function(groupID, persons, doWhat) {
+        for (var i in persons) {
+            var payload = { _id: persons[i], memberOf: groupID, action: doWhat };
+            $http.put("/person/memberof", payload);
+        }
+    }
+
+    // db CUD
     var changeGroup = function(data) {
         // update persons
         getGroupMembers(data._id, function(groupMembersThen) {
@@ -116,15 +124,8 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
             var toDeleteFrom = difference(groupMembersThen, groupMembersNow);
             var toAddTo = difference(groupMembersNow, groupMembersThen);
 
-            for (var i in toDeleteFrom) {
-                var payload = { _id: toDeleteFrom[i], memberOf: data._id, action: 'remove' };
-                $http.put("/person/memberof", payload);
-            }
-            
-            for (var i in toAddTo) {
-                var payload = { _id: toAddTo[i], memberOf: data._id, action: 'add' };
-                $http.put("/person/memberof", payload);
-            }
+            changePersonsMemberOf(data._id, toDeleteFrom, 'remove');
+            changePersonsMemberOf(data._id, toAddTo, 'add');
         });
         
         // update group
@@ -138,8 +139,8 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
     }
 
     var deleteGroup = function(id) {
-        getGroupMembers(id, function(groupMembers) {
-            deleteGroupFromPersons(id, groupMembers);
+        getGroupMembers(id, function(formerGroupMembers) {
+            changePersonsMemberOf(id, formerGroupMembers, 'remove');
         });
 
         $http.delete("/group?_id=" + id).then(
@@ -154,8 +155,8 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
     var insertGroup = function(data) {
         $http.post("/group", data).then(
             function(rep) {
-                data.members = data.members ? data.members : [];
-                addGroupToPersons(rep.data._id, data.members);
+                var newMembers = data.members ? data.members : [];
+                changePersonsMemberOf(rep.data._id, newMembers, 'add');
                 
                 ctrl.loadGroups();
                 common.alert('alert-success', 'Dane dodane');
