@@ -14,7 +14,6 @@ app.config(['$routeProvider', '$locationProvider', 'routes', function($routeProv
     $locationProvider.hashPrefix('');
 	for(var i in routes) {
         $routeProvider.when(routes[i].route, routes[i]);
-        //console.log("routes[i].route=" + routes[i].route + " routes[i]=" + routes[i]);
 	}
 	$routeProvider.otherwise({ redirectTo: '/' });
 }]);

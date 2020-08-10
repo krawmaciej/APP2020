@@ -25,11 +25,11 @@
         <p></p>
         <select multiple class="form-control" id="czlonkowie" size=10 style="overflow-y: auto" ng-model="ctrl.opt.data.members">
             <option ng-repeat="person in ctrl.persons" ng-value="person._id">
-                {{person.firstName + ' ' + person.lastName + ' : ' + person.email}}
+                {{person.email}}
             </option>
         </select>
         <p></p>
-        <div class="form-inline">
+        <div>
             <button class="btn btn-default fa fa-angle-down" ng-click="ctrl.increaseLimit()" ng-disabled="ctrl.limitReached()"></button>
         </div>
     </div>

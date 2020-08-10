@@ -194,24 +194,7 @@ var rest = module.exports = {
         restHelper.getObjects(common.groups, arg, 10, aggregation, {
             $or: [ {
                 name: { $regex: new RegExp(arg.query.search, 'i') } }, {
-                description: { $regex: new RegExp(arg.query.search, 'i') } }, {
-                numberOfMembers: { $regex: new RegExp(arg.query.search, 'i') } }
-                // to delete
-                /*
-                , 
-                {
-                persons: { 
-                    $elemMatch: {
-                        $or: [
-                            { firstName: { $regex: new RegExp(arg.query.search, 'i') } },
-                            { lastName: { $regex: new RegExp(arg.query.search, 'i') } },
-                            { email: { $regex: new RegExp(arg.query.search, 'i') } },
-                            { yearofbirth: { $regex: new RegExp(arg.query.search, 'i') } }
-                        ]
-                    }
-                } }
-                */
-                //
+                description: { $regex: new RegExp(arg.query.search, 'i') } }
             ]
         });
     }

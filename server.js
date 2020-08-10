@@ -29,7 +29,7 @@ httpServer.on('request', function (req, rep) {
     var now = Date.now();
     if(!session || !common.sessions[session]) {
         session = uuid.v4();
-        common.sessions[session] = { from: req.connection.remoteAddress, created: now, touched: now, login: null, role: 1 }; // change role to 0
+        common.sessions[session] = { from: req.connection.remoteAddress, created: now, touched: now, login: null, role: 0 };
         console.log('New session ' + session + ': ' + JSON.stringify(common.sessions[session]));
     } else {
         common.sessions[session].touched = now;

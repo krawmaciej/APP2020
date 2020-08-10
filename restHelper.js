@@ -76,24 +76,16 @@ var restHelper = module.exports = {
                     switch(arg.payload.action) {
                         case 'add':
                             delete arg.payload.action;
-                            //var gID = mongodb.ObjectID(arg.payload.memberOf);
-                            //var action = { $push: { memberOf: arg.payload.memberOf } };
                             var action = { $push: arg.payload };
-                            console.log('caseADD=' + JSON.stringify(action));
                             break;
                         case 'remove':
                             delete arg.payload.action;
                             var action = { $pull: arg.payload };
-                            console.log('caseDEL=' + JSON.stringify(action));
                             break;
                         default:
-                            // to delete
-                            //console.log('DEFAULT=' + arg.payload.action);
-                            //console.log('ARGPL=' + JSON.stringify(arg.payload));
-                            //delete arg.payload.action;
                             var action = { $set: arg.payload };
                     }
-                    console.log('id=' + id + '\naction=' + JSON.stringify(action));
+                    console.log('PUT id=' + id + ' action=' + JSON.stringify(action));
                     collection.findOneAndUpdate({ _id: id },
                                                 action,
                                                 { returnOriginal: false }, function(err, updated) {
