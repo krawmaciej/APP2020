@@ -117,39 +117,38 @@ app.controller('GroupsCtrl', ['$scope', '$http', '$uibModal', 'common', function
 
     // db CUD
     var changeGroup = function(data) {
-        // update persons
         getGroupMembers(data._id, function(groupMembersThen) {
             var groupMembersNow = data.members ? data.members : [];
-
+            // get persons to remove/add group from/to
             var toDeleteFrom = difference(groupMembersThen, groupMembersNow);
             var toAddTo = difference(groupMembersNow, groupMembersThen);
-
+            // update persons
             changePersonsMemberOf(data._id, toDeleteFrom, 'remove');
             changePersonsMemberOf(data._id, toAddTo, 'add');
+            // update group
+            $http.put("/group", data).then(
+                function(rep) {
+                    ctrl.loadGroups();
+                    common.alert('alert-success', 'Dane zmienione');
+                },
+                function(err) {}    
+            );
         });
-        
-        // update group
-        $http.put("/group", data).then(
-            function(rep) {
-                ctrl.loadGroups();
-                common.alert('alert-success', 'Dane zmienione');
-            },
-            function(err) {}    
-        );
     }
 
     var deleteGroup = function(id) {
         getGroupMembers(id, function(formerGroupMembers) {
+            // remove group from former members
             changePersonsMemberOf(id, formerGroupMembers, 'remove');
+            // remove group
+            $http.delete("/group?_id=" + id).then(
+                function(rep) {
+                    ctrl.loadGroups();
+                    common.alert('alert-success', 'Dane usunięte');
+                },
+                function(err) {}
+            );
         });
-
-        $http.delete("/group?_id=" + id).then(
-            function(rep) {
-                ctrl.loadGroups();
-                common.alert('alert-success', 'Dane usunięte');
-            },
-            function(err) {}
-        );
     }
 
     var insertGroup = function(data) {

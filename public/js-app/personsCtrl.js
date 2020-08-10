@@ -117,39 +117,40 @@ app.controller('PersonsCtrl', ['$scope', '$http', '$uibModal', 'common', functio
 
     // db CUD
     var changePerson = function(data) {
-        // update groups
         getPersonMemberOf(data._id, function(personMemberOfThen) {
             var personMemberOfNow = data.memberOf ? data.memberOf : [];
-
+            // get groups to remove/add persons from/to
             var toDeleteFrom = difference(personMemberOfThen, personMemberOfNow);
             var toAddTo = difference(personMemberOfNow, personMemberOfThen);
-
+            // update groups
             changeGroupMembers(data._id, toDeleteFrom, 'remove');
             changeGroupMembers(data._id, toAddTo, 'add');
+            // update person
+            $http.put("/person", data).then(
+                function(rep) {
+                    ctrl.loadPersons();
+                    common.alert('alert-success', 'Dane zmienione');
+                },
+                function(err) {}    
+            );
         });
         
-        // update person
-        $http.put("/person", data).then(
-            function(rep) {
-                ctrl.loadPersons();
-                common.alert('alert-success', 'Dane zmienione');
-            },
-            function(err) {}    
-        );
     }
 
     var deletePerson = function(id) {
         getPersonMemberOf(id, function(formerPersonMemberOf) {
+            // remove person from former groups
             changeGroupMembers(id, formerPersonMemberOf, 'remove');
+            // remove group
+            $http.delete("/person?_id=" + id).then(
+                function(rep) {
+                    ctrl.loadPersons();
+                    common.alert('alert-success', 'Dane usunięte');
+                },
+                function(err) {}
+            );
         });
 
-        $http.delete("/person?_id=" + id).then(
-            function(rep) {
-                ctrl.loadPersons();
-                common.alert('alert-success', 'Dane usunięte');
-            },
-            function(err) {}
-        );
     }
 
     var insertPerson = function(data) {
