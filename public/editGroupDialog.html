@@ -9,12 +9,29 @@
     <div class="modal-body" id="modal-body">
         <label for="nazwa">Nazwa</label>
         <input class="form-control" id="nazwa" type="text" ng-model="ctrl.opt.data.name" autofocus/>
+        <p></p>
+        <label for="nazwa">Opis</label>
+        <input class="form-control" id="opis" type="text" ng-model="ctrl.opt.data.description"/>
+        <p></p>
         <label for="czlonkowie">Członkowie</label>
-        <select multiple class="form-control" id="czlonkowie" ng-model="ctrl.opt.data.members">
+        <div class="form-inline">
+            <input id="limit" class="form-control" type="number" ng-model="ctrl.limit" ng-change="ctrl.loadPersons()" style="width: 8em;"/>
+            <label for="limit" class="fa fa-list-ol"></label>
+            <span class label="label label-default">
+                Wszystkich
+                <span class="badge" ng-bind="ctrl.personsTotal"></span>
+            </span>
+        </div>
+        <p></p>
+        <select multiple class="form-control" id="czlonkowie" size=10 style="overflow-y: auto" ng-model="ctrl.opt.data.members">
             <option ng-repeat="person in ctrl.persons" ng-value="person._id">
                 {{person.firstName + ' ' + person.lastName + ' : ' + person.email}}
             </option>
         </select>
+        <p></p>
+        <div class="form-inline">
+            <button class="btn btn-default fa fa-angle-down" ng-click="ctrl.increaseLimit()" ng-disabled="ctrl.limitReached()"></button>
+        </div>
     </div>
 
     <div class="modal-footer">

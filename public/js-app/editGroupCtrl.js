@@ -4,12 +4,31 @@ app.controller('EditGroupCtrl', ['$http', '$uibModalInstance', 'editGroupOptions
     var ctrl = this;
 
     ctrl.opt = editGroupOptions;
-
+    ctrl.personsTotal = 0;
+    ctrl.limit = 10;
     ctrl.persons = [];
-    $http.get('/persons').then(
-        function(rep) { ctrl.persons = rep.data.data; },
-        function(err) {}
-    );
+
+    ctrl.loadPersons = function(callback = null) {
+        $http.get('/persons?limit=' + ctrl.limit).then(
+            function(rep) { 
+                document.getElementById("czlonkowie").size = ctrl.limit;
+                ctrl.persons = rep.data.data;
+                ctrl.personsTotal = rep.data.count;
+            },
+            function(err) {}
+        );
+    }
+
+    ctrl.increaseLimit = function() {
+        ctrl.limit += 5;
+        ctrl.loadPersons();
+    }
+
+    ctrl.limitReached = function() {
+        return ctrl.personsTotal <= ctrl.limit;
+    }
+
+    ctrl.loadPersons();
 
     ctrl.save = function() { $uibModalInstance.close('save'); };
     ctrl.delete = function() {
