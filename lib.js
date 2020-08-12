@@ -3,7 +3,6 @@
 var lib = module.exports = {
 
     sendJson: (rep, obj) => {
-        //console.log("sent JSON: " + JSON.stringify(obj));
         rep.writeHead(200, 'OK', {'Content-Type':'application/json'}
         );
         rep.write(JSON.stringify(obj));
@@ -25,7 +24,6 @@ var lib = module.exports = {
             try {
                 payload = payload.trim();
                 callback(rep, payload ? JSON.parse(payload) : {});
-                //console.log("sent payload: " + payload);
             } catch(ex) {
                 lib.sendError(rep, 400, 'Broken data');
             }

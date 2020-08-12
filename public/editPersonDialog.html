@@ -7,32 +7,36 @@
     </div>
 
     <div class="modal-body" id="modal-body">
-        <label for="imie">Imię</label>
-        <input class="form-control" id="imie" type="text" ng-model="ctrl.opt.data.firstName" autofocus/>
-        <p></p>
-        <label for="nazwisko">Nazwisko</label>
-        <input class="form-control" id="nazwisko" type="text" ng-model="ctrl.opt.data.lastName"/>
-        <p></p>
-        <label for="email">E-mail</label>
-        <input class="form-control" id="email" type="text" ng-model="ctrl.opt.data.email"/>
-        <p></p>
-        <label for="rok">Rok urodzenia</label>
-        <input class="form-control" id="rok" type="number" ng-model="ctrl.opt.data.yearofbirth"/>
-        <p></p>
+        <p>
+            <label for="imie">Imię</label>
+            <input class="form-control" id="imie" type="text" ng-model="ctrl.opt.data.firstName" autofocus/>
+        </p>
+        <p>
+            <label for="nazwisko">Nazwisko</label>
+            <input class="form-control" id="nazwisko" type="text" ng-model="ctrl.opt.data.lastName"/>
+        </p>
+        <p>
+          <label for="email">E-mail</label>
+            <input class="form-control" id="email" type="text" ng-model="ctrl.opt.data.email"/>
+        </p>
+        <p>
+            <label for="rok">Rok urodzenia</label>
+            <input class="form-control" id="rok" type="number" ng-model="ctrl.opt.data.yearofbirth"/>
+        </p>
         <label for="grupy">Grupy</label>
-        <div class="form-inline">
+        <p class="form-inline">
             <input id="limit" class="form-control" type="number" ng-model="ctrl.limit" ng-change="ctrl.loadGroups()" style="width: 8em;"/>
             <label for="limit" class="fa fa-list-ol"></label>
             <span class label="label label-default">
                 Wszystkich
                 <span class="badge" ng-bind="ctrl.groupsTotal"></span>
             </span>
-        </div>
-        <p></p>
-        <select multiple class="form-control" id="grupy" size=10 style="overflow-y: auto" ng-model="ctrl.opt.data.memberOf">
-            <option ng-repeat="group in ctrl.groups" ng-value="group._id">{{group.name}}</option>
-        </select>
-        <p></p>
+        </p>
+        <p>
+            <select multiple class="form-control" id="grupy" size=10 style="overflow-y: auto" ng-model="ctrl.opt.data.memberOf">
+                <option ng-repeat="group in ctrl.groups" ng-value="group._id">{{group.name}}</option>
+            </select>
+        </p>
         <div>
             <button class="btn btn-default fa fa-angle-down" ng-click="ctrl.increaseLimit()" ng-disabled="ctrl.limitReached()"></button>
         </div>
